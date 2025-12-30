@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WEB - Controle de Importação</title>
+    <style>
+      :root {
+        --bg: #0a0f1a;
+        --surface: rgba(16, 24, 40, 0.85);
+        --surface-2: rgba(30, 41, 59, 0.50);
+        --muted: rgba(203, 213, 225, 0.80);
+        --text: rgba(241, 245, 249, 0.98);
+        --border: rgba(148, 163, 184, 0.18);
+        --accent: rgba(56, 189, 248, 0.95);
+        --ring: rgba(56, 189, 248, 0.20);
+        --danger: rgba(239, 68, 68, 0.90);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.5;
+        background: radial-gradient(800px 500px at 15% 10%, rgba(56, 189, 248, 0.06), transparent), var(--bg);
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .app-header {
+        position: sticky;
+        top: 0;
+        background: rgba(11, 18, 32, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        z-index: 5;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .brand-title {
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+
+      .brand-subtitle {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+      }
+
+      .tab:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+      }
+
+      .tab.is-active {
+        border-color: rgba(125, 211, 252, 0.35);
+        box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.08);
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      }
+
+      .panel + .panel {
+        margin-top: 20px;
+      }
+
+      .panel-section {
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
+        border-top: 1px solid var(--border);
+      }
+
+      .panel-section:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+      }
+
+      .panel-note {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      h1 {
+        margin: 0 0 16px;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--text);
+      }
+
+      h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+      }
+
+      .kpi {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        background: rgba(30, 41, 59, 0.30);
+        transition: background 160ms ease, border-color 160ms ease;
+      }
+
+      .kpi:hover {
+        background: rgba(30, 41, 59, 0.45);
+        border-color: rgba(148, 163, 184, 0.28);
+      }
+
+      .kpi .label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .kpi .value {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 6px;
+        letter-spacing: -0.02em;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+      }
+
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .spacer {
+        flex: 1;
+      }
+
+      .charts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .chart-card {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .chart-card.donut-card {
+        display: grid;
+        grid-template-columns: 1fr 200px;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .chart-card.donut-card .chart-title {
+        grid-column: 1 / -1;
+      }
+
+      .chart-card.donut-card .legend {
+        margin-top: 0;
+        flex-direction: column;
+      }
+
+      .chart-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .chart-title .muted {
+        font-size: 12px;
+      }
+
+      canvas {
+        width: 100%;
+        height: 260px;
+        display: block;
+      }
+
+      .table-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .btn.btn-danger {
+        border-color: rgba(239, 68, 68, 0.40);
+        background: rgba(239, 68, 68, 0.15);
+        color: rgba(254, 202, 202, 0.95);
+      }
+
+      .btn.btn-danger:hover {
+        border-color: rgba(239, 68, 68, 0.60);
+        background: rgba(239, 68, 68, 0.22);
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .list-item {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+        transition: border-color 140ms ease, background 140ms ease;
+      }
+
+      .list-item:hover {
+        background: rgba(255, 255, 255, 0.045);
+        border-color: rgba(255, 255, 255, 0.16);
+      }
+
+      .list-item.is-active {
+        border-color: rgba(125, 211, 252, 0.35);
+      }
+
+      .form-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 200px minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .field-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .field-row .label {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .btn {
+        border: 1px solid rgba(125, 211, 252, 0.35);
+        background: rgba(125, 211, 252, 0.12);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(125, 211, 252, 0.55);
+        background: rgba(125, 211, 252, 0.16);
+      }
+
+      .btn:active {
+        transform: translateY(0px);
+      }
+
+      .btn.btn-secondary {
+        border-color: var(--border);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .btn.btn-secondary:hover {
+        border-color: rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="date"],
+      select {
+        border: 1px solid var(--border);
+        background: rgba(30, 41, 59, 0.40);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 8px;
+        width: 100%;
+        min-width: 0;
+        outline: none;
+        font-size: 14px;
+        transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      input[type="date"]:focus,
+      select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--ring);
+        background: rgba(30, 41, 59, 0.60);
+      }
+
+      select {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 32px;
+      }
+
+      select option {
+        background: #1e293b;
+        color: var(--text);
+        padding: 8px;
+      }
+
+      .table-wrap {
+        overflow: auto;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .table th {
+        position: sticky;
+        top: 0;
+        background: rgba(11, 18, 32, 0.55);
+        backdrop-filter: blur(8px);
+      }
+
+      .table th,
+      .table td {
+        border-bottom: 1px solid var(--border);
+        padding: 12px 10px;
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      .table tbody tr {
+        transition: background 120ms ease;
+      }
+
+      .table tbody tr:hover {
+        background: rgba(30, 41, 59, 0.35);
+        cursor: pointer;
+      }
+
+      .table td input {
+        width: 100%;
+        min-width: 120px;
+      }
+
+      .excel-grid {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: 1fr;
+      }
+
+      @media (min-width: 1024px) {
+        .excel-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .excel-grid-full {
+          grid-column: 1 / -1;
+        }
+      }
+
+      .excel-section {
+        background: rgba(16, 24, 40, 0.40);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 18px;
+      }
+
+      .excel-section-title {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .log {
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        padding: 12px;
+        margin-top: 12px;
+        max-height: 320px;
+        overflow: auto;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 120ms ease;
+        font-size: 13px;
+      }
+
+      .legend-item:hover {
+        background: rgba(30, 41, 59, 0.40);
+      }
+
+      .legend-item.inactive {
+        opacity: 0.35;
+      }
+
+      .legend-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+      }
+
+      @media (max-width: 980px) {
+        .kpis {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .charts {
+          grid-template-columns: 1fr;
+        }
+
+        .field-row {
+          grid-template-columns: 1fr;
+        }
+
+        canvas {
+          height: 220px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="container">
+        <div class="brand">
+          <div class="brand-title">Controle de Importação</div>
+          <div class="brand-subtitle">Baseado no FL x AGRO VITA X PROARCO.xlsx</div>
+        </div>
+        <nav class="tabs" id="tabs">
+          <button class="tab is-active" data-tab="dashboard">Dashboard</button>
+          <button class="tab" data-tab="purchases">Compras</button>
+          <button class="tab" data-tab="list">Lista</button>
+          <button class="tab" data-tab="ledger">Caixa</button>
+          <button class="tab" data-tab="import">Importar</button>
+          <button class="tab" data-tab="export">Exportar</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel" id="panel-dashboard" data-panel="dashboard">
+        <h1>Dashboard</h1>
+        <div class="kpis" id="kpis"></div>
+
+        <div class="charts">
+          <div class="chart-card donut-card">
+            <div class="chart-title">
+              <div><strong>Composição de Custos</strong></div>
+              <div class="muted">Custo Fronteira / Presumido / Lucro / Despesas</div>
+            </div>
+            <canvas id="chartDonut"></canvas>
+            <div class="legend" id="donutLegend"></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-title">
+              <div><strong>Custo Conta Corrente por Compra</strong></div>
+              <div class="muted">Comparativo entre compras (últimas 10)</div>
+            </div>
+            <canvas id="chartBars"></canvas>
+            <div class="legend" id="barsLegend"></div>
+          </div>
+        </div>
+
+        <div class="panel-note">
+          Fidelidade: os cálculos seguem as fórmulas extraídas do Excel (totais e valores por item).
+        </div>
+      </section>
+
+      <section class="panel" id="panel-import" data-panel="import" hidden>
+        <h1>Importar</h1>
+        <p class="muted">Importe o <strong>.xlsx</strong> para carregar compras + caixa, ou um <strong>.json</strong> exportado.</p>
+
+        <div class="panel-note">
+          Atalho pra não confundir o endereço:
+          <br />
+          1) Se você rodar o servidor <strong>dentro</strong> da pasta <strong>WEB</strong>, a URL certa é <strong>/</strong>
+          (ex.: <code>http://localhost:5173/</code>). Nesse caso, <strong>/WEB/</strong> vai dar 404.
+          <br />
+          2) Se você rodar o servidor na <strong>raiz</strong> do workspace, aí sim acesse <strong>/WEB/</strong>
+          (ex.: <code>http://localhost:5173/WEB/</code>).
+        </div>
+
+        <h2>XLSX</h2>
+        <div class="form-row">
+          <input type="file" id="fileInput" accept=".xlsx" />
+          <button class="btn" id="btnImport">Importar</button>
+          <button class="btn btn-secondary" id="btnClear">Limpar dados</button>
+        </div>
+
+        <h2 style="margin-top: 14px">JSON</h2>
+        <div class="form-row">
+          <input type="file" id="jsonInput" accept="application/json" />
+          <button class="btn btn-secondary" id="btnImportJson">Importar JSON</button>
+        </div>
+
+        <pre class="log" id="importLog"></pre>
+      </section>
+
+      <section class="panel" id="panel-purchases" data-panel="purchases" hidden>
+        <h1 id="purchaseTitle">Compras</h1>
+        <div class="row" id="purchaseRow">
+          <button class="btn btn-secondary" id="btnNewPurchase">Nova compra</button>
+          <div class="spacer"></div>
+          <div class="muted" id="purchaseHint">Selecione uma compra na aba Lista para editar.</div>
+        </div>
+
+        <div class="panel-section" id="purchaseSection">
+          <h2 id="editorTitle">Editor</h2>
+          <div id="purchaseEditor" class="muted">Nenhuma compra selecionada.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-list" data-panel="list" hidden>
+        <div class="row" style="align-items: center; margin-bottom: 16px;">
+          <h1 style="margin: 0;">Lista</h1>
+          <div class="spacer"></div>
+          <div class="field-row" style="margin-bottom: 0; min-width: 250px; grid-template-columns: auto 1fr;">
+            <div class="label">Status</div>
+            <select id="statusFilter">
+              <option value="Todos">Todos</option>
+              <option value="Carregando">Carregando</option>
+              <option value="Viajando">Viajando</option>
+              <option value="Concluído">Concluído</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-note">Visualize, edite ou exclua compras.</div>
+        <div class="table-wrap" style="margin-top: 10px">
+          <table class="table" id="purchaseTable"></table>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-ledger" data-panel="ledger" hidden>
+        <div class="row" style="align-items: center; margin-bottom: 16px;">
+          <h1 style="margin: 0;">Caixa</h1>
+          <div class="spacer"></div>
+          <div class="field-row" style="margin-bottom: 0; min-width: 200px; grid-template-columns: auto 1fr;">
+            <div class="label">Mês</div>
+            <select id="ledgerMonth"></select>
+          </div>
+          <div class="field-row" style="margin-bottom: 0; min-width: 150px; grid-template-columns: auto 1fr;">
+            <div class="label">Ano</div>
+            <select id="ledgerYear"></select>
+          </div>
+          <button class="btn btn-secondary" id="btnAddLedger">Adicionar lançamento</button>
+        </div>
+
+        <div class="kpis" id="ledgerKpis"></div>
+
+        <div class="panel-section">
+          <h2>Lançamentos</h2>
+          <div class="table-wrap">
+            <table class="table" id="ledgerTable"></table>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>Compras do mês</h2>
+          <div class="table-wrap">
+            <table class="table" id="ledgerPurchasesTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-export" data-panel="export" hidden>
+        <h1>Exportar</h1>
+        <div class="form-row">
+          <button class="btn" id="btnExportJson">Exportar como JSON</button>
+        </div>
+        <pre class="log" id="dataLog"></pre>
+      </section>
+    </main>
+
+    <!-- XLSX parser (SheetJS) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
